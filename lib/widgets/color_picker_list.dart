@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:sketch_book/app/view/app.dart';
 import 'package:sketch_book/models/sketch_book_type.dart';
 
 class ColorPickerList extends StatelessWidget {
@@ -38,18 +39,24 @@ class ColorPickerList extends StatelessWidget {
               colorIndex,
               SketchBookType.pencil,
             ),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              height: currentIndex == colorIndex ? 60 : 45,
-              width: currentIndex == colorIndex ? 60 : 45,
-              decoration: BoxDecoration(
-                color: Colors.primaries[colorIndex],
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white,
-                  width: currentIndex == colorIndex ? 4 : 2,
-                ),
-              ),
+            child: ValueListenableBuilder(
+              valueListenable: themeMode,
+              builder: (context, mode, child) {
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  height: currentIndex == colorIndex ? 60 : 45,
+                  width: currentIndex == colorIndex ? 60 : 45,
+                  decoration: BoxDecoration(
+                    color: Colors.primaries[colorIndex],
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color:
+                          mode == ThemeMode.dark ? Colors.white : Colors.black,
+                      width: currentIndex == colorIndex ? 4 : 2,
+                    ),
+                  ),
+                );
+              },
             ),
           );
         },

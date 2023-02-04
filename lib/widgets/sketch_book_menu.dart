@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:sketch_book/app/view/app.dart';
 import 'package:sketch_book/extensions/helper_ex.dart';
 import 'package:sketch_book/models/sketch_book_type.dart';
 
@@ -55,6 +56,20 @@ class SketchBookMenu extends StatelessWidget {
             size: 25,
           ),
         ),
+        Tooltip(
+          message: 'Theme',
+          child: ValueListenableBuilder(
+            valueListenable: themeMode,
+            builder: (context, mode, child) {
+              return Switch.adaptive(
+                value: mode == ThemeMode.dark,
+                onChanged: (value) {
+                  themeMode.value = value ? ThemeMode.dark : ThemeMode.light;
+                },
+              );
+            },
+          ),
+        ),
       ],
     );
   }
@@ -65,17 +80,26 @@ class SketchBookMenu extends StatelessWidget {
         onSelected: (value) => onMenuSelected.call(null, value),
         itemBuilder: (context) {
           return [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: SketchBookType.pencil,
-              child: Text('Normal Brush'),
+              child: Text(
+                'Normal Brush',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: SketchBookType.shader,
-              child: Text('Rainbow Brush'),
+              child: Text(
+                'Rainbow Brush',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: SketchBookType.dashed,
-              child: Text('Dash Brush'),
+              child: Text(
+                'Dash Brush',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
             ),
           ];
         },
@@ -93,25 +117,40 @@ class SketchBookMenu extends StatelessWidget {
         onSelected: (value) => onMenuSelected.call(value.toDouble(), null),
         itemBuilder: (context) {
           return [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 10,
-              child: Text('10'),
+              child: Text(
+                '10',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 20,
-              child: Text('20'),
+              child: Text(
+                '20',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 30,
-              child: Text('30'),
+              child: Text(
+                '30',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 40,
-              child: Text('40'),
+              child: Text(
+                '40',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 50,
-              child: Text('50'),
+              child: Text(
+                '50',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
             ),
           ];
         },
