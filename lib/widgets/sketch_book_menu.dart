@@ -4,9 +4,18 @@ import 'package:sketch_book/extensions/helper_ex.dart';
 import 'package:sketch_book/models/sketch_book_type.dart';
 
 class SketchBookMenu extends StatelessWidget {
-  const SketchBookMenu({super.key, required this.onMenuSelected});
+  const SketchBookMenu({
+    super.key,
+    required this.onMenuSelected,
+    required this.onDelete,
+    required this.onUndo,
+    required this.onRedo,
+  });
 
-  final Function(double, SketchBookType?) onMenuSelected;
+  final Function(double?, SketchBookType?) onMenuSelected;
+  final VoidCallback onDelete;
+  final VoidCallback onUndo;
+  final VoidCallback onRedo;
 
   @override
   Widget build(BuildContext context) {
@@ -14,38 +23,25 @@ class SketchBookMenu extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         IconButton(
-          onPressed: () {
-            context.showToast('Redo');
-          },
+          onPressed: onRedo,
           icon: const Icon(
             FontAwesomeIcons.redo,
             size: 30,
           ),
         ),
         IconButton(
-          onPressed: () {
-            context.showToast('Undo');
-          },
+          onPressed: onUndo,
           icon: const Icon(
             FontAwesomeIcons.undo,
             size: 25,
           ),
         ),
-        IconButton(
-          onPressed: () {
-            onMenuSelected.call(20, SketchBookType.pencil);
-            context.showToast('Brush selected');
-          },
-          icon: const Icon(
-            FontAwesomeIcons.pen,
-            size: 30,
-          ),
-        ),
+        _brushTypeButton(context),
         _brushSizeButton(context),
         IconButton(
           onPressed: () {
             context.showToast('Eraser selected');
-            onMenuSelected.call(20, SketchBookType.eraser);
+            onMenuSelected.call(null, SketchBookType.eraser);
           },
           icon: const Icon(
             FontAwesomeIcons.eraser,
@@ -53,7 +49,7 @@ class SketchBookMenu extends StatelessWidget {
           ),
         ),
         IconButton(
-          onPressed: () {},
+          onPressed: onDelete,
           icon: const Icon(
             FontAwesomeIcons.trash,
             size: 25,
@@ -63,10 +59,37 @@ class SketchBookMenu extends StatelessWidget {
     );
   }
 
+  Widget _brushTypeButton(BuildContext context) {
+    return InkResponse(
+      child: PopupMenuButton(
+        onSelected: (value) => onMenuSelected.call(null, value),
+        itemBuilder: (context) {
+          return [
+            const PopupMenuItem(
+              value: SketchBookType.pencil,
+              child: Text('Normal Brush'),
+            ),
+            const PopupMenuItem(
+              value: SketchBookType.shader,
+              child: Text('Rainbow Brush'),
+            ),
+            const PopupMenuItem(
+              value: SketchBookType.dashed,
+              child: Text('Dash Brush'),
+            ),
+          ];
+        },
+        child: const Icon(
+          FontAwesomeIcons.pen,
+          size: 30,
+        ),
+      ),
+    );
+  }
+
   Widget _brushSizeButton(BuildContext context) {
-    return IconButton(
-      onPressed: () {},
-      icon: PopupMenuButton(
+    return InkResponse(
+      child: PopupMenuButton(
         onSelected: (value) => onMenuSelected.call(value.toDouble(), null),
         itemBuilder: (context) {
           return [

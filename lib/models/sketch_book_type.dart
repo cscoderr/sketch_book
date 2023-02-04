@@ -1,6 +1,6 @@
 enum SketchBookType {
+  pencil,
   shader,
   eraser,
-  pencil,
-  pixelate,
+  dashed,
 }

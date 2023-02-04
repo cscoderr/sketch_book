@@ -1,7 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:screenshot/screenshot.dart';
+import 'package:sketch_book/extensions/helper_ex.dart';
 import 'package:sketch_book/models/sketch_book.dart';
 import 'package:sketch_book/models/sketch_book_type.dart';
 import 'package:sketch_book/view/home_page_body.dart';
@@ -17,18 +18,22 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late List<SketchBook> sketches;
+  late List<SketchBook> undoSketches;
+  late List<SketchBook> redoSketches;
   late Color selectedColor;
   int selectedColorIndex = 0;
   SketchBook? selectedSketch;
   late SketchBookType sketchType;
   late double strokeWidth;
-  Uint8List? _imageFile;
+  XFile? selectedImage;
   late ScreenshotController screenshotController;
 
   @override
   void initState() {
     super.initState();
     sketches = [];
+    undoSketches = [];
+    redoSketches = [];
     screenshotController = ScreenshotController();
     sketchType = SketchBookType.pencil;
     selectedColor = Colors.primaries[0];
@@ -39,7 +44,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: SketchBookAppBar(
-        onSave: _onSave,
+        onSave: () => _onSave(context),
         onSelectImage: _onSelectImage,
       ),
       body: Padding(
@@ -50,6 +55,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             HomePageBody(
+              image: selectedImage,
               screenshotController: screenshotController,
               sketches: sketches,
               onStart: _onStart,
@@ -74,9 +80,34 @@ class _HomePageState extends State<HomePage> {
               height: 15,
             ),
             SketchBookMenu(
+              onUndo: () {
+                if (sketches.isNotEmpty) {
+                  setState(() {
+                    final sketch = sketches.removeLast();
+                    undoSketches.add(sketch);
+                  });
+                }
+              },
+              onRedo: () {
+                if (undoSketches.isNotEmpty) {
+                  setState(() {
+                    final sketch = undoSketches.removeLast();
+                    sketches.add(sketch);
+                  });
+                }
+              },
+              onDelete: () {
+                setState(() {
+                  sketches.clear();
+                  selectedSketch = null;
+                });
+                context.showToast('Sketches cleared');
+              },
               onMenuSelected: (value, type) {
                 setState(() {
-                  strokeWidth = value;
+                  if (sketchType != SketchBookType.eraser) {
+                    strokeWidth = value ?? strokeWidth;
+                  }
                   sketchType = type ?? sketchType;
                   selectedColor = Colors.primaries[selectedColorIndex];
                 });
@@ -88,12 +119,31 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _onSelectImage() {}
+  void _onSelectImage() async {
+    final picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      selectedImage = image;
+    });
+  }
 
-  void _onSave() {
-    screenshotController.capture().then((image) {
-      print("capture");
-      _imageFile = image;
+  void _onSave(BuildContext context) {
+    screenshotController.capture().then((image) async {
+      String fileName = "sketchbook_${DateTime.now().microsecondsSinceEpoch}";
+      if (image != null) {
+        await ImageGallerySaver.saveImage(
+          image,
+          name: fileName,
+          isReturnImagePathOfIOS: true,
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Image saved to gallery'),
+            ),
+          );
+        }
+      }
     }).catchError((onError) {
       print(onError);
     });
@@ -108,7 +158,7 @@ class _HomePageState extends State<HomePage> {
               ? Colors.white
               : selectedColor,
           offsets: [details.localPosition],
-          strokeWidth: strokeWidth,
+          strokeWidth: sketchType == SketchBookType.eraser ? 40 : strokeWidth,
           sketchType: sketchType,
         );
         sketches.add(selectedSketch!);
