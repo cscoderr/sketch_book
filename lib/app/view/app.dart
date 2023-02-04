@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sketch_book/presentation/home/home.dart';
+import 'package:sketch_book/view/home_page.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -10,7 +10,7 @@ class App extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData.dark().copyWith(
         textTheme: const TextTheme(
-          headlineLarge: TextStyle(
+          headlineMedium: TextStyle(
             fontFamily: 'GothicAXHand',
           ),
         ),

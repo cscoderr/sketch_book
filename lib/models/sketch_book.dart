@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:sketch_book/presentation/home/models/sketch_book_type.dart';
+import 'package:sketch_book/models/sketch_book_type.dart';
 
 class SketchBook {
   SketchBook({
