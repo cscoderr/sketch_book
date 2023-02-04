@@ -29,6 +29,12 @@ class SketchBookPainter extends CustomPainter {
           );
         }
       }
+      canvas.clipRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(8, 35, size.width - 16, size.height - 45),
+          const Radius.circular(15),
+        ),
+      );
       canvas.drawPath(path, paint);
     }
   }

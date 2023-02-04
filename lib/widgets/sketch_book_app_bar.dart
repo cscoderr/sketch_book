@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SketchBookAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const SketchBookAppBar({super.key});
+  const SketchBookAppBar({
+    super.key,
+    required this.onSave,
+    required this.onSelectImage,
+  });
+
+  final VoidCallback onSave;
+  final VoidCallback onSelectImage;
 
   @override
   Widget build(BuildContext context) {
@@ -14,14 +21,14 @@ class SketchBookAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: [
         IconButton(
-          onPressed: () {},
+          onPressed: () => onSelectImage.call(),
           icon: const Icon(
             FontAwesomeIcons.image,
             size: 25,
           ),
         ),
         IconButton(
-          onPressed: () {},
+          onPressed: () => onSave.call(),
           icon: const Icon(
             FontAwesomeIcons.solidFloppyDisk,
             size: 25,
@@ -32,5 +39,5 @@ class SketchBookAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(60);
+  Size get preferredSize => const Size.fromHeight(65);
 }

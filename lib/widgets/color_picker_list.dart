@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:sketch_book/models/sketch_book_type.dart';
 
 class ColorPickerList extends StatelessWidget {
   const ColorPickerList({
@@ -11,7 +12,7 @@ class ColorPickerList extends StatelessWidget {
 
   final Color selectedColor;
   final int currentIndex;
-  final Function(Color, int) onColorChanged;
+  final Function(Color, int, SketchBookType) onColorChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +33,11 @@ class ColorPickerList extends StatelessWidget {
           }
           final colorIndex = index - 1;
           return InkResponse(
-            onTap: () =>
-                onColorChanged.call(Colors.primaries[colorIndex], colorIndex),
+            onTap: () => onColorChanged.call(
+              Colors.primaries[colorIndex],
+              colorIndex,
+              SketchBookType.pencil,
+            ),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               height: currentIndex == colorIndex ? 60 : 45,
@@ -69,8 +73,11 @@ class ColorPickerList extends StatelessWidget {
           content: SingleChildScrollView(
             child: ColorPicker(
               pickerColor: selectedColor,
-              onColorChanged: (color) =>
-                  onColorChanged.call(color, currentIndex),
+              onColorChanged: (color) => onColorChanged.call(
+                color,
+                currentIndex,
+                SketchBookType.pencil,
+              ),
               colorPickerWidth: 300,
               pickerAreaHeightPercent: 0.9,
               enableAlpha: true,

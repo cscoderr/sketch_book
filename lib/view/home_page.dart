@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:sketch_book/models/sketch_book.dart';
 import 'package:sketch_book/models/sketch_book_type.dart';
 import 'package:sketch_book/view/home_page_body.dart';
@@ -19,11 +22,14 @@ class _HomePageState extends State<HomePage> {
   SketchBook? selectedSketch;
   late SketchBookType sketchType;
   late double strokeWidth;
+  Uint8List? _imageFile;
+  late ScreenshotController screenshotController;
 
   @override
   void initState() {
     super.initState();
     sketches = [];
+    screenshotController = ScreenshotController();
     sketchType = SketchBookType.pencil;
     selectedColor = Colors.primaries[0];
     strokeWidth = 10;
@@ -32,52 +38,65 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const SketchBookAppBar(),
+      appBar: SketchBookAppBar(
+        onSave: _onSave,
+        onSelectImage: _onSelectImage,
+      ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-        child: SafeArea(
-          child: Column(
-            children: [
-              HomePageBody(
-                sketches: sketches,
-                onStart: _onStart,
-                onUpdate: _onUpdate,
-                onEnd: _onEnd,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Column(
-                children: [
-                  ColorPickerList(
-                    currentIndex: selectedColorIndex,
-                    selectedColor: selectedColor,
-                    onColorChanged: (color, index) {
-                      setState(() {
-                        selectedColor = color;
-                        selectedColorIndex = index;
-                      });
-                    },
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  SketchBookMenu(
-                    onMenuSelected: (value, type) {
-                      setState(() {
-                        strokeWidth = value;
-                        sketchType = type;
-                        selectedColor = Colors.primaries[selectedColorIndex];
-                      });
-                    },
-                  ),
-                ],
-              )
-            ],
-          ),
+        padding: const EdgeInsets.symmetric(
+          vertical: 30,
+          horizontal: 10,
+        ),
+        child: Column(
+          children: [
+            HomePageBody(
+              screenshotController: screenshotController,
+              sketches: sketches,
+              onStart: _onStart,
+              onUpdate: _onUpdate,
+              onEnd: _onEnd,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            ColorPickerList(
+              currentIndex: selectedColorIndex,
+              selectedColor: selectedColor,
+              onColorChanged: (color, index, type) {
+                setState(() {
+                  selectedColor = color;
+                  selectedColorIndex = index;
+                  sketchType = type;
+                });
+              },
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            SketchBookMenu(
+              onMenuSelected: (value, type) {
+                setState(() {
+                  strokeWidth = value;
+                  sketchType = type ?? sketchType;
+                  selectedColor = Colors.primaries[selectedColorIndex];
+                });
+              },
+            )
+          ],
         ),
       ),
     );
+  }
+
+  void _onSelectImage() {}
+
+  void _onSave() {
+    screenshotController.capture().then((image) {
+      print("capture");
+      _imageFile = image;
+    }).catchError((onError) {
+      print(onError);
+    });
   }
 
   void _onStart(DragStartDetails details) {
@@ -85,7 +104,9 @@ class _HomePageState extends State<HomePage> {
       () {
         selectedSketch = SketchBook(
           id: const Uuid().v4(),
-          color: selectedColor,
+          color: sketchType == SketchBookType.eraser
+              ? Colors.white
+              : selectedColor,
           offsets: [details.localPosition],
           strokeWidth: strokeWidth,
           sketchType: sketchType,

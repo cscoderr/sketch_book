@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:sketch_book/extensions/helper_ex.dart';
 import 'package:sketch_book/models/sketch_book_type.dart';
 
 class SketchBookMenu extends StatelessWidget {
   const SketchBookMenu({super.key, required this.onMenuSelected});
 
-  final Function(double, SketchBookType) onMenuSelected;
+  final Function(double, SketchBookType?) onMenuSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -13,21 +14,28 @@ class SketchBookMenu extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            context.showToast('Redo');
+          },
           icon: const Icon(
             FontAwesomeIcons.redo,
             size: 30,
           ),
         ),
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            context.showToast('Undo');
+          },
           icon: const Icon(
             FontAwesomeIcons.undo,
             size: 25,
           ),
         ),
         IconButton(
-          onPressed: () => onMenuSelected.call(20, SketchBookType.pencil),
+          onPressed: () {
+            onMenuSelected.call(20, SketchBookType.pencil);
+            context.showToast('Brush selected');
+          },
           icon: const Icon(
             FontAwesomeIcons.pen,
             size: 30,
@@ -35,7 +43,10 @@ class SketchBookMenu extends StatelessWidget {
         ),
         _brushSizeButton(context),
         IconButton(
-          onPressed: () => onMenuSelected.call(20, SketchBookType.eraser),
+          onPressed: () {
+            context.showToast('Eraser selected');
+            onMenuSelected.call(20, SketchBookType.eraser);
+          },
           icon: const Icon(
             FontAwesomeIcons.eraser,
             size: 25,
@@ -56,8 +67,7 @@ class SketchBookMenu extends StatelessWidget {
     return IconButton(
       onPressed: () {},
       icon: PopupMenuButton(
-        onSelected: (value) =>
-            onMenuSelected.call(value.toDouble(), SketchBookType.pencil),
+        onSelected: (value) => onMenuSelected.call(value.toDouble(), null),
         itemBuilder: (context) {
           return [
             const PopupMenuItem(
@@ -83,7 +93,7 @@ class SketchBookMenu extends StatelessWidget {
           ];
         },
         child: const Icon(
-          FontAwesomeIcons.brush,
+          FontAwesomeIcons.listUl,
           size: 25,
         ),
       ),
